@@ -32,16 +32,14 @@ const register = async (req, res) => {
         return res.status(400).json({ error: `El nombre de usuario debe tener entre ${MIN_USERNAME_LENGTH} y ${MAX_USERNAME_LENGTH} caracteres` });
       }
 
-      // Hash the password before saving
-      const hashedPassword = await bcrypt.hash(password, 10);
-  
-      if( !username === "admin" || !username === "Invitado" ) {
-        const user = new User({ username, email, password: hashedPassword });
-        await user.save();
-      } else {
+      if( username === "admin" || username === "Invitado" ) {
         return res.status(400).json({ error: "No se permite el registro de usuarios con el nombre de usuario 'admin' o 'Invitado'" });
       }
 
+      // Hash the password before saving
+      const hashedPassword = await bcrypt.hash(password.trim(), 10);
+      const user = new User({ username, email, password: hashedPassword });
+      await user.save();
       res.status(201).json({ message: "Usuario registrado" });
     } catch (err) {
       res.status(500).json({ error: "Error en el servidor" });
@@ -55,7 +53,8 @@ const login = async (req, res) => {
     const user = await User.findOne({ username });
     if (!user) throw new Error("Usuario no encontrado");
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password.trim(), user.password);
+
     if (!isMatch) {
         throw new Error("Contraseña incorrecta");
     }
