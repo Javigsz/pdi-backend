@@ -66,7 +66,7 @@ const login = async (req, res) => {
     res.cookie('token', token, {
       httpOnly: true,  // No accesible desde JavaScript (previene XSS)
       secure: process.env.NODE_ENV === 'production',  // Solo en HTTPS en producción
-      sameSite: 'Strict',  // Protege contra CSRF
+      sameSite: 'None',  // Protege contra CSRF
       maxAge: 5200000
     });
   
