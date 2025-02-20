@@ -12,9 +12,10 @@ router.post("/login", login);
 
 router.post("/logout", verificarJWT, (req, res) => {
   res.clearCookie("token", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'Strict',
+    httpOnly: true,  // No accesible desde JavaScript (previene XSS)
+      secure: process.env.NODE_ENV === 'production',  // Solo en HTTPS en producción
+      sameSite: 'None',  // Protege contra CSRF
+      maxAge: 5200000
   });
   res.status(200).json({ mensaje: "Logout exitoso" });
 });
